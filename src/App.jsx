@@ -7,10 +7,9 @@ const App = () => {
   return (
     <Router> {/* 🔹 전체 앱을 Router로 감싸기 */}
       <Routes>
-        {/* 🔹 루트 페이지 */}
         <Route path="/" element={
           <div className="container">
-            <GoogleCallback /> {/* GoogleCallback이 이제 Router 내부에서 실행됨 */}
+            <Route path="/callback" element={<GoogleCallback />} />
             <div className="card">
               <img src={logo} alt="앱 로고" className="app-logo" />
               <h1>인증 성공!</h1>
