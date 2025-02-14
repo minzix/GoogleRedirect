@@ -23,20 +23,45 @@
 // };
 
 // export default App;
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import GoogleCallback from "./GoogleCallback"; 
+import { useEffect, useState } from "react";
+import axios from "axios";
 import logo from "./assets/logo.png";
 import "./App.css";
 
-const Home = () => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const code = searchParams.get("code");
+const GoogleCallback = () => {
+  const [isCodeSent, setIsCodeSent] = useState(false);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get("code");
+
+    console.log("code 값:", code); // 코드가 정상적으로 들어오는지 확인
+
+    if (!code || isCodeSent) return;
+
+    axios
+      .post(
+        "https://sof.backendbase.site/api/auth/code",
+        { code },
+        { headers: { "Content-Type": "application/json" } }
+      )
+      .then((res) => {
+        console.log("토큰 요청 성공", res.data);
+        setIsCodeSent(true);
+      })
+      .catch((err) => {
+        console.error("토큰 요청 실패", err.response ? err.response.data : err.message);
+      });
+  }, [isCodeSent]);
+
+  return null; // 별도 UI 없음
+};
+
+const App = () => {
   return (
     <div className="container">
       {/* ✅ URL에 "code"가 있으면 GoogleCallback 실행 */}
-      {code ? <GoogleCallback /> : null}
+      <GoogleCallback />
 
       <div className="card">
         <img src={logo} alt="앱 로고" className="app-logo" />
@@ -47,19 +72,6 @@ const Home = () => {
   );
 };
 
-const App = () => {
-  return (
-    <Router>
-      <Routes>
-        {/* ✅ 루트("/")에서도 GoogleCallback을 실행할 수 있도록 Home 컴포넌트 사용 */}
-        <Route path="/" element={<Home />} />
-
-        {/* ✅ 개별적으로 /callback 경로도 추가 가능 */}
-        <Route path="/callback" element={<GoogleCallback />} />
-      </Routes>
-    </Router>
-  );
-};
-
 export default App;
+
 
